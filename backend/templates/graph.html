@@ -1,0 +1,218 @@
+<head>
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+
+<body>
+
+    <div id="myDiv" style="height:100%; width: 100%;">
+        <!-- Plotly chart will be drawn inside this DIV -->
+    </div>
+    <script>
+
+        Plotly.d3.csv("https://raw.githubusercontent.com/felipeardilac/hackaton/master/dataset.csv", function (err, rows) {
+
+            function unpack(rows, key) {
+                return rows.map(function (row) { return row[key]; });
+            }
+
+            var inputJson = {{ params| safe
+        }}
+
+
+            type = inputJson.graph_type
+            target = unpack(rows, inputJson.target)
+
+            if (inputJson.aggregation.length == 0 & inputJson.filter.length == 0) {
+            plot_title = 'cost'
+            var trace1 = {
+                type: type,
+                name: 'bar',
+                y: target
+            }
+        }
+
+
+        if (inputJson.aggregation.length == 1) {
+            x = unpack(rows, inputJson.aggregation[0])
+            plot_title = 'Total cost per '.concat(inputJson.aggregation[0])
+            if (inputJson.graph_type == 'bar') {
+                if (inputJson.filter.length == 0) {
+                    var trace1 = {
+                        type: type,
+                        name: 'cost',
+                        x: x,
+                        y: target
+
+
+                    }
+                } else {
+                    var trace1 = {
+                        type: type,
+                        name: 'cost',
+                        x: x,
+                        y: target,
+                        transforms: [{
+                            type: 'filter',
+                            target: unpack(rows, inputJson.filter[0].filter_name),
+                            operation: '>=',
+                            value: inputJson.filter[0].filter_value.substring(0, 7)
+                        },
+                        {
+                            type: 'filter',
+                            target: unpack(rows, inputJson.filter[0].filter_name),
+                            operation: '<=',
+                            value: inputJson.filter[0].filter_value.substring(8, 16)
+                        }]
+
+
+                    }
+
+
+                }
+            }
+            if (inputJson.graph_type == 'pie') {
+                if (inputJson.filter.length == 0) {
+                    var trace1 = {
+                        type: type,
+                        name: 'cost',
+                        labels: x,
+                        values: target
+
+
+                    }
+                } else {
+                    var trace1 = {
+                        type: type,
+                        name: 'cost',
+                        labels: x,
+                        values: target,
+                        transforms: [{
+                            type: 'filter',
+                            target: unpack(rows, inputJson.filter[0].filter_name),
+                            operation: '>=',
+                            value: inputJson.filter[0].filter_value.substring(0, 7)
+                        },
+                        {
+                            type: 'filter',
+                            target: unpack(rows, inputJson.filter[0].filter_name),
+                            operation: '<=',
+                            value: inputJson.filter[0].filter_value.substring(8, 16)
+                        }]
+
+                    }
+
+                }
+            }
+        }
+
+
+
+        if (inputJson.aggregation.length == 2) {
+            x = unpack(rows, inputJson.aggregation[0])
+            y = unpack(rows, inputJson.aggregation[1])
+
+            plot_title = 'Total cost per '.concat(inputJson.aggregation[0], ' AND ', inputJson.aggregation[1])
+            if (inputJson.graph_type == 'bar') {
+                if (inputJson.filter.length == 0) {
+                    var trace1 = {
+                        type: type,
+                        name: 'cost',
+                        x: x,
+                        y: target,
+                        transforms: [{
+                            type: 'groupby',
+                            groups: y,
+                        }]
+                    }
+
+                } else {
+                    var trace1 = {
+                        type: type,
+                        name: 'cost',
+                        x: x,
+                        y: target,
+                        transforms: [{
+                            type: 'groupby',
+                            groups: y,
+                        },
+                        {
+                            type: 'filter',
+                            target: unpack(rows, inputJson.filter[0].filter_name),
+                            operation: '>=',
+                            value: inputJson.filter[0].filter_value.substring(0, 7)
+                        },
+                        {
+                            type: 'filter',
+                            target: unpack(rows, inputJson.filter[0].filter_name),
+                            operation: '<=',
+                            value: inputJson.filter[0].filter_value.substring(8, 16)
+                        }]
+                    }
+                }
+
+            }
+            if (inputJson.graph_type == 'bubble') {
+                var desired_maximum_marker_size = 4;
+                var size = [400];
+                if (inputJson.filter.length == 0) {
+                    var trace1 = {
+                        x: x,
+                        y: y,
+                        mode: 'markers',
+                        marker: {
+                            size: target,
+                            color: target,
+                            //set 'sizeref' to an 'ideal' size given by the formula sizeref = 2. * max(array_of_size_values) / (desired_maximum_marker_size ** 2)
+                            sizeref: 2.0 * Math.max(...size) / (desired_maximum_marker_size ** 2),
+                            sizemode: 'area'
+                        }
+                    };
+                } else {
+                    var trace1 = {
+                        x: x,
+                        y: y,
+                        mode: 'markers',
+                        marker: {
+                            size: target,
+                            color: target,
+                            //set 'sizeref' to an 'ideal' size given by the formula sizeref = 2. * max(array_of_size_values) / (desired_maximum_marker_size ** 2)
+                            sizeref: 2.0 * Math.max(...size) / (desired_maximum_marker_size ** 2),
+                            sizemode: 'area'
+                        },
+                        transforms: [{
+                            type: 'groupby',
+                            groups: y,
+                        },
+                        {
+                            type: 'filter',
+                            target: unpack(rows, inputJson.filter[0].filter_name),
+                            operation: '>=',
+                            value: inputJson.filter[0].filter_value.substring(0, 7)
+                        },
+                        {
+                            type: 'filter',
+                            target: unpack(rows, inputJson.filter[0].filter_name),
+                            operation: '<=',
+                            value: inputJson.filter[0].filter_value.substring(8, 16)
+                        }]
+                    };
+
+                }
+
+            }
+
+        }
+
+
+        var data = [trace1];
+
+        var layout = {
+            title: plot_title
+        };
+
+        Plotly.newPlot('myDiv', data, layout, { showSendToCloud: true });
+        })
+
+    </script>
+</body>

@@ -1,0 +1,45 @@
+actions:
+- action_apply_aggregation
+- action_apply_filter
+- action_change_chart
+- action_clear_graph
+- action_start_analysis
+- action_remove_filter
+- action_remove_aggregation
+entities:
+- aggregation
+- chart_type
+- dataset
+- filter_name
+- filter_value
+- target
+intents:
+- start_analysis:
+    triggers: action_start_analysis
+- apply_aggregation:
+    triggers: action_apply_aggregation
+- change_chart:
+    triggers: action_change_chart
+- apply_filter:
+    triggers: action_apply_filter
+- remove_filter:
+    triggers: action_remove_filter
+- remove_aggregation:
+    triggers: action_remove_aggregation
+- clear_graph:
+    triggers: action_clear_graph
+- start_analysis+apply_filter:
+    triggers: action_apply_filter
+slots:
+  aggregation_list:
+    type: unfeaturized
+  chart_type:
+    type: unfeaturized
+  data_type:
+    type: unfeaturized
+  dataset:
+    type: unfeaturized
+  filter_list:
+    type: unfeaturized
+  target:
+    type: unfeaturized
